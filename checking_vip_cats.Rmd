@@ -1,0 +1,627 @@
+---
+title: "checking_vips"
+author: "Joshua Schmidt"
+date: "23/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r htvip GO file generation, cache=TRUE,eval = FALSE}
+library(data.table)
+htvips <- fread("/Users/joshuaschmidt/Projects/highthroughput_VIPs/ht_vips.txt")
+genes <- fread("/Users/joshuaschmidt/Projects/ancestral_chimp/chimp_go/chimp.genes.human.names.homologs.and.amb.homology_mar.17.sorted.bed",col.names = c("chr","start","end","chimp.ens","chimp.name","human.ens","human.name"))
+
+# loop over single virues....
+viruses <- names(htvips)
+
+# htvip categories
+htviplists <- list()
+htvipcount = 0
+
+for (v in viruses) {
+  htvipcount = htvipcount+1
+  vsetgenes <- htvips[,get(v)][which(htvips[,get(v)]!="")]
+  chimpgenes <- sort(genes[human.ens %in% vsetgenes]$chimp.name)
+  vipDT <- data.table(cat=paste0("htvip:",sprintf("%07d", htvipcount)),
+                      name=v,
+                      genes=paste(chimpgenes,collapse = " "))
+  htviplists[[v]] <- vipDT
+}
+# also categpries for RNA and DNA. from Enard 2018 table S1-viruses
+rna <- c("Coronaviruses","DENV","EBOV","HCV","HIV","HTLV","IAV")
+dna <- c("ADV","EBV","HBV","HCMV","HPV","HSV","KSHV","SV40","VACV")
+# rna %in% dna
+# dna %in% rna
+# length(c(rna,dna))
+# length(names(htviplists))
+# rna superclass
+htvipcount = htvipcount+1
+vsetgenes <- vector()
+for (v in rna) {
+  tmp <- htvips[,get(v)][which(htvips[,get(v)]!="")]
+  vsetgenes <- sort(c(vsetgenes,tmp))
+  vsetgenes <- unique(vsetgenes)
+} 
+chimpgenes <- sort(genes[human.ens %in% vsetgenes]$chimp.name)
+vipDT <- data.table(cat=paste0("htvip:",sprintf("%07d", htvipcount)),
+                    name="rna",
+                    genes=paste(chimpgenes,collapse = " "))
+htviplists[["rna"]] <- vipDT
+# dna superclass
+htvipcount = htvipcount+1
+vsetgenes <- vector()
+for (v in dna) {
+  tmp <- htvips[,get(v)][which(htvips[,get(v)]!="")]
+  vsetgenes <- sort(c(vsetgenes,tmp))
+  vsetgenes <- unique(vsetgenes)
+} 
+chimpgenes <- sort(genes[human.ens %in% vsetgenes]$chimp.name)
+vipDT <- data.table(cat=paste0("htvip:",sprintf("%07d", htvipcount)),
+                    name="dna",
+                    genes=paste(chimpgenes,collapse = " "))
+htviplists[["dna"]] <- vipDT
+# all genes category
+vipDT <- data.table(cat=paste0("htvip:",sprintf("%07d", 9999)),
+                    name="all.genes",
+                    genes=paste(unique(sort(genes[,chimp.name])),collapse = " "))
+htviplists[["all.genes"]] <- vipDT
+
+# write out file
+for(n in names(htviplists)) {
+  write.table(htviplists[[n]],
+              file="/Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/htvip.gene.set_and.all.txt",append = TRUE, sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
+}
+
+```
+
+```{r new ltvips}
+ltvip_info <- fread("/Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/lt_ens_gene_viruses.txt",sep="\t",header=T)
+names(ltvip_info) <- c("ens","gene","viral_info","host")
+viruses <- fread("/Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/lt_viruses.txt",sep="\t",header=T)
+
+
+# ltvip categories
+new_ltviplists <- list()
+ltvipcount = 0
+
+for (name in viruses$abbreviation){
+  ltvipcount = ltvipcount +1
+  ltvgenes <- unique(sort(ltvip_info[grep(name,viral_info)]$ens))
+  ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name=name,
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[[name]] <- vipDT
+  }
+}
+
+# super categories, based on the seven baltimore defs
+
+#1 dsDNA
+ltvipcount = ltvipcount +1
+ltvgenes <- unique(sort(ltvip_info[grep("dsDNA",viral_info)][!grep("dsDNART",viral_info)]$ens))
+ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name="dsDNA",
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[["dsDNA"]] <- vipDT
+  }
+
+#2 ssDNA
+ltvipcount = ltvipcount +1
+ltvgenes <- unique(sort(ltvip_info[grep("ssDNA",viral_info)]$ens))
+ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name="ssDNA",
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[["ssDNA"]] <- vipDT
+  }
+
+#3 dsRNA
+ltvipcount = ltvipcount +1
+ltvgenes <- unique(sort(ltvip_info[grep("dsRNA",viral_info)]$ens))
+ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name="dsRNA",
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[["dsRNA"]] <- vipDT
+  }
+
+# 4 + 5. ssRNA: not split between +ve and -ve strand
+## ssRNA
+ltvipcount = ltvipcount +1
+ltvgenes <- unique(sort(ltvip_info[grep("ssRNA",viral_info)][!grep("ssRNART",viral_info)]$ens))
+ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name="ssRNA",
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[["ssRNA"]] <- vipDT
+  }
+
+#6 ssRNART
+ltvipcount = ltvipcount +1
+ltvgenes <- unique(sort(ltvip_info[grep("ssRNART",viral_info)]$ens))
+ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name="ssRNART",
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[["ssRNART"]] <- vipDT
+  }
+
+#7 dsDNART
+ltvipcount = ltvipcount +1
+ltvgenes <- unique(sort(ltvip_info[grep("dsDNART",viral_info)]$ens))
+ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name="dsDNART",
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[["dsDNART"]] <- vipDT
+  }
+
+# all DNA
+ltvipcount = ltvipcount +1
+ltvgenes <- unique(sort(ltvip_info[grep("dna|DNA",viral_info)]$ens))
+ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name="DNA",
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[["DNA"]] <- vipDT
+  }
+
+# all RNA
+ltvipcount = ltvipcount +1
+ltvgenes <- unique(sort(ltvip_info[grep("rna|RNA",viral_info)]$ens))
+ltvgeneschimp <- unique(sort(genes[human.ens %in% ltvgenes]$chimp.name))
+  if (length(ltvgeneschimp >=1)) {
+    vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", ltvipcount)),
+                      name="RNA",
+                      genes=paste(ltvgeneschimp,collapse = " "))
+    new_ltviplists[["RNA"]] <- vipDT
+  }
+
+# all genes category
+vipDT <- data.table(cat=paste0("ltvip:",sprintf("%07d", 9999)),
+                    name="all.genes",
+                    genes=paste(unique(sort(genes[,chimp.name])),collapse = " "))
+new_ltviplists[["all.genes"]] <- vipDT
+
+# write out file
+for(n in names(new_ltviplists)) {
+  write.table(new_ltviplists[[n]],
+              file="/Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/ltvip.gene.set_and.all.txt",append = TRUE, sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
+}
+
+
+```
+
+
+```{r new merged vip lists}
+hts <- sort(names(htviplists))[-c(2,3)]
+new_merged <- list()
+# ADV, matches ADV in lt vips
+combined_genes <- unique(sort(c(htviplists[["ADV"]][,strsplit(unlist(genes)," ")]$V1,new_ltviplists[["ADV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 1)),
+                    name="ADV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["ADV"]] <- vipDT
+# Coronaviruses, matches SARSCOV, CORONAVIRUS,HCOVNL63,TGEV,HCOV229E in lt vips
+combined_genes <- unique(sort(c(htviplists[["Coronaviruses"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["SARSCOV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["CORONAVIRUS"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["HCOVNL63"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["TGEV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["HCOV229E"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 2)),
+                    name="COV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["COV"]] <- vipDT
+# DENV, matches DENV in lt vips
+combined_genes <- unique(sort(c(htviplists[["DENV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["DENV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 3)),
+                    name="DENV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["DENV"]] <- vipDT
+# EBOV, matches EBOV in lt vips
+combined_genes <- unique(sort(c(htviplists[["EBOV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["EBOV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 4)),
+                    name="EBOV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["EBOV"]] <- vipDT
+# EBV, matches EBV in lt vips
+combined_genes <- unique(sort(c(htviplists[["EBV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["EBV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 5)),
+                    name="Epstein-Barr",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["Epstein-Barr"]] <- vipDT
+# HBV, matches HBV in lt vips
+combined_genes <- unique(sort(c(htviplists[["HBV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["HBV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 6)),
+                    name="HBV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["HBV"]] <- vipDT
+
+# HCMV, matches HCMV in lt vips
+combined_genes <- unique(sort(c(htviplists[["HCMV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["HCMV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 7)),
+                    name="HCMV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["HCMV"]] <- vipDT
+
+
+# HCV, matches HCV in lt vips
+combined_genes <- unique(sort(c(htviplists[["HCV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["HCV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 8)),
+                    name="HCV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["HCV"]] <- vipDT
+# HIV, matches HIV1,HIV2,SIV in lt vips
+combined_genes <- unique(sort(c(htviplists[["HIV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["HIV1"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["HIV2"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["SIV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 9)),
+                    name="HIV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["HIV"]] <- vipDT
+# HPV, matches CRPV,rHPV,BPV in lt vips
+combined_genes <- unique(sort(c(htviplists[["HPV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["CRPV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["rHPV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["BPV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 10)),
+                    name="HPV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["HPV"]] <- vipDT
+# HSV, matches BHV and HHV6 in ltvips not closley related enough to merge
+combined_genes <- unique(sort(c(htviplists[["HSV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 11)),
+                    name="HSV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["HSV"]] <- vipDT
+# HTLV, matches CRPV,rHPV,BPV in lt vips
+combined_genes <- unique(sort(c(htviplists[["HTLV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 12)),
+                    name="HTLV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["HTLV"]] <- vipDT
+# IAV, influenza matches INFLUENZA in lt vips
+combined_genes <- unique(sort(c(htviplists[["IAV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["INFLUENZA"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 13)),
+                    name="IAV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["IAV"]] <- vipDT
+
+# KSHV, matches KSHV in lt vips
+combined_genes <- unique(sort(c(htviplists[["KSHV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["KSHV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 14)),
+                    name="KSHV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["KSHV"]] <- vipDT
+# SV40, matches SV40 in lt vips
+combined_genes <- unique(sort(c(htviplists[["SV40"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["SV40"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 15)),
+                    name="SV40",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["SV40"]] <- vipDT
+# VACV, matches VACV in lt vips
+combined_genes <- unique(sort(c(htviplists[["VACV"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["VACV"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 16)),
+                    name="VACV",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["VACV"]] <- vipDT
+
+# RNA, matches RNA in lt vips
+combined_genes <- unique(sort(c(htviplists[["RNA"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["RNA"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 17)),
+                    name="RNA",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["RNA"]] <- vipDT
+# DNA, matches DNA in lt vips
+combined_genes <- unique(sort(c(htviplists[["DNA"]][,strsplit(unlist(genes)," ")]$V1,
+                                new_ltviplists[["DNA"]][,strsplit(unlist(genes)," ")]$V1)))
+vipDT <- data.table(cat=paste0("mergedvip:",sprintf("%07d", 18)),
+                    name="DNA",
+                    genes=paste(combined_genes,collapse = " "))
+new_merged[["DNA"]] <- vipDT
+
+new_merged[["all.genes"]] <- htviplists[["all.genes"]]
+
+# write out file
+for(n in names(new_merged)) {
+  write.table(new_merged[[n]],
+              file="/Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/mergedvip.gene.set_and.all.txt",append = TRUE, sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
+}
+
+
+
+# updated KEGG
+KEGG <- readRDS("/Users/joshuaschmidt/Box/multistat.block.perm/multi.stat.block.perm/newKEGG.set.rds")
+for(i in KEGG[,unique(id)]) {
+  write.table(KEGG[id==i,.(id,name,genes)],
+              file="/Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/KEGG.gene.set_and.all.txt",append = TRUE, sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
+}
+
+
+```
+# the new enrichments
+
+```{bash GOWINDA htvip, cache=TRUE, eval = FALSE}
+cd /Users/joshuaschmidt/Projects/ancestral_chimp
+#htvips
+for c in "_0.0005" "_0.005" "_0.1"; do
+java -Xmx16g -jar chimp_go/Gowinda-1.12.jar --snp-file all.windows.3pclr.ce.ncBACKGROUNDSNPint.txt --candidate-snp-file aligned_3pclr_out_genome_wide${c}percentsubsetCANDSNP.txt --gene-set-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/htvip.gene.set_and.all.txt --annotation-file chimp_go/chimp.genes.human.names.homologs.and.amb.homology_mar.17.gtf --simulations 1000000 --min-significance 1 --gene-definition updownstream2000 --threads 12 --output-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/results/genome_wide${c}percentsubsetCANDSNP_htvip.txt --mode gene --min-genes 3;
+done
+
+#lowt VIPs
+for c in "_0.0005" "_0.005" "_0.1"; do
+java -Xmx16g -jar chimp_go/Gowinda-1.12.jar --snp-file all.windows.3pclr.ce.ncBACKGROUNDSNPint.txt --candidate-snp-file aligned_3pclr_out_genome_wide${c}percentsubsetCANDSNP.txt --gene-set-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/ltvip.gene.set_and.all.txt --annotation-file chimp_go/chimp.genes.human.names.homologs.and.amb.homology_mar.17.gtf --simulations 1000000 --min-significance 1 --gene-definition updownstream2000 --threads 12 --output-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/results/genome_wide${c}percentsubsetCANDSNP_ltvip.txt --mode gene --min-genes 3;
+done
+
+# merged VIPs
+for c in "_0.0005" "_0.005" "_0.1"; do
+java -Xmx16g -jar chimp_go/Gowinda-1.12.jar --snp-file all.windows.3pclr.ce.ncBACKGROUNDSNPint.txt --candidate-snp-file aligned_3pclr_out_genome_wide${c}percentsubsetCANDSNP.txt --gene-set-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/mergedvip.gene.set_and.all.txt --annotation-file chimp_go/chimp.genes.human.names.homologs.and.amb.homology_mar.17.gtf --simulations 1000000 --min-significance 1 --gene-definition updownstream2000 --threads 12 --output-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/results/genome_wide${c}percentsubsetCANDSNP_mergedvip.txt --mode gene --min-genes 3;
+done
+
+# siv responsive
+for c in "_0.0005" "_0.005" "_0.1"; do
+java -Xmx16g -jar chimp_go/Gowinda-1.12.jar --snp-file all.windows.3pclr.ce.ncBACKGROUNDSNPint.txt --candidate-snp-file aligned_3pclr_out_genome_wide${c}percentsubsetCANDSNP.txt --gene-set-file /Users/joshuaschmidt/Projects/ancestral_chimp/chimp_go/ververt.siv.CD4only_all.genes.txt --annotation-file chimp_go/chimp.genes.human.names.homologs.and.amb.homology_mar.17.gtf --simulations 1000000 --min-significance 1 --gene-definition updownstream2000 --threads 12 --output-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/results/genome_wide${c}percentsubsetCANDSNP_sivresponsive.txt --mode gene --min-genes 3;
+done
+
+# modules of expression
+for c in "_0.0005" "_0.005" "_0.1"; do
+java -Xmx16g -jar chimp_go/Gowinda-1.12.jar --snp-file all.windows.3pclr.ce.ncBACKGROUNDSNPint.txt --candidate-snp-file aligned_3pclr_out_genome_wide${c}percentsubsetCANDSNP.txt --gene-set-file /Users/joshuaschmidt/Projects/ancestral_chimp/chimp_go/ververt.siv.modules.set_all.genes.txt --annotation-file chimp_go/chimp.genes.human.names.homologs.and.amb.homology_mar.17.gtf --simulations 1000000 --min-significance 1 --gene-definition updownstream2000 --threads 12 --output-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/results/genome_wide${c}percentsubsetCANDSNP_sivmodules.txt --mode gene --min-genes 3;
+done
+
+
+# KEGG
+for c in "_0.0005" "_0.005" "_0.1"; do
+java -Xmx16g -jar chimp_go/Gowinda-1.12.jar --snp-file all.windows.3pclr.ce.ncBACKGROUNDSNPint.txt --candidate-snp-file aligned_3pclr_out_genome_wide${c}percentsubsetCANDSNP.txt --gene-set-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/KEGG.gene.set_and.all.txt --annotation-file chimp_go/chimp.genes.human.names.homologs.and.amb.homology_mar.17.gtf --simulations 1000000 --min-significance 1 --gene-definition updownstream2000 --threads 12 --output-file /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/results/genome_wide${c}percentsubsetCANDSNP_KEGG.txt --mode gene --min-genes 3;
+done
+
+
+```
+
+
+#### Make 1'heatmap' type of figure summarising the GO results.
+```{bash GO heatmap, eval=FALSE}
+cd  /Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/results/
+
+rm go_summary.txt;
+for c in "_0.0005" "_0.005" "_0.1"; do
+awk -v cutoff="$c" '{print $1"\t"$4"\t"$5"\t"$9"\tsivresponsive\t"cutoff}' genome_wide${c}percentsubsetCANDSNP_sivresponsive.txt >> go_summary.txt;
+awk -v cutoff="$c" '{print $1"\t"$4"\t"$5"\t"$9"\tmergedvip\t"cutoff}' genome_wide${c}percentsubsetCANDSNP_mergedvip.txt >> go_summary.txt;
+awk -v cutoff="$c" '{print $1"\t"$4"\t"$5"\t"$9"\tKEGG\t"cutoff}' genome_wide${c}percentsubsetCANDSNP_KEGG.txt >> go_summary.txt;
+awk -v cutoff="$c" '{print $1"\t"$4"\t"$5"\t"$9"\tsivmodules\t"cutoff}' genome_wide${c}percentsubsetCANDSNP_sivmodules.txt >> go_summary.txt;
+done
+```
+
+```{r R GO heatmap}
+setwd("/Users/joshuaschmidt/Projects/ancestral_chimp_selection/enrichment_tests/results/")
+gohm <- fread("go_summary.txt",header=FALSE,col.names = c("id","p","fdr","name","testset","candset"))
+gohm[candset=="_0.1",candset:="_0.001"]
+gohm[candset=="_0.005",x:=1]
+gohm[candset=="_0.001",x:=2]
+gohm[candset=="_0.0005",x:=3]
+
+# build structure for go plot
+heatmapDT <- data.table(x=gohm[id=="siv:2"][order(x)]$x,y=c(1,1,1),z=gohm[id=="siv:2"][order(x)]$p*3,name="SIV responsive",testset="SIV responsive")
+
+# modules
+min.y <- heatmapDT[,max(y)]+2
+t.set <- "sivmodules"
+termnames <- gohm[testset==t.set][!name=="all_genes"][fdr*3 < 0.1,unique(name)]
+for (n in termnames){
+  tmp <- gohm[name== n][order(x)]
+  if (dim(tmp)[[1]]!=3) {
+    tmp_replace <- data.table()
+    for (i in 1:3){
+      if (!i %in% tmp$x) {
+        tmp.i <- data.table(x=i,y=min.y,z=1,name=n,testset=t.set)
+        tmp_replace <- rbind(tmp_replace,tmp.i)
+      }
+      if (i %in% tmp$x) {
+        tmp.i <- tmp[x==i & name==n][,.(x,y=min.y,z=fdr*3,name,testset=t.set)]
+        tmp_replace <- rbind(tmp_replace,tmp.i)
+      }
+    }
+    heatmapDT <- rbind(heatmapDT,tmp_replace)
+     min.y <- min.y + 1
+  }
+  if (dim(tmp)[[1]]==3) {
+    tmp <- tmp[,.(x,y=min.y,z=fdr*3,name,testset=t.set)]
+    heatmapDT <- rbind(heatmapDT,tmp)
+    min.y <- min.y + 1
+  }
+}
+
+
+# mergedvip vips
+min.y <- heatmapDT[,max(y)]+2
+t.set <- "mergedvip"
+termnames <- gohm[testset==t.set][!name=="all_genes"][fdr*3 < 0.1,unique(name)]
+#max.y <- length(vips)+min.y-1
+for (n in termnames){
+  tmp <- gohm[name== n][order(x)]
+  if (dim(tmp)[[1]]!=3) {
+    tmp_replace <- data.table()
+    for (i in 1:3){
+      if (!i %in% tmp$x) {
+        tmp.i <- data.table(x=i,y=min.y,z=1,name=n,testset=t.set)
+        tmp_replace <- rbind(tmp_replace,tmp.i)
+      }
+      if (i %in% tmp$x) {
+        tmp.i <- tmp[x==i & name==n][,.(x,y=min.y,z=fdr*3,name,testset=t.set)]
+        tmp_replace <- rbind(tmp_replace,tmp.i)
+      }
+    }
+    heatmapDT <- rbind(heatmapDT,tmp_replace)
+     min.y <- min.y + 1
+  }
+  if (dim(tmp)[[1]]==3) {
+    tmp <- tmp[,.(x,y=min.y,z=fdr*3,name,testset=t.set)]
+    heatmapDT <- rbind(heatmapDT,tmp)
+    min.y <- min.y + 1
+  }
+}
+
+
+# KEGG
+min.y <- heatmapDT[,max(y)]+2
+t.set <- "KEGG"
+termnames <- gohm[testset==t.set][!name=="all_genes"][fdr*3 < 0.1,unique(name)]
+#max.y <- length(vips)+min.y-1
+for (n in termnames){
+  tmp <- gohm[name== n][order(x)]
+  if (dim(tmp)[[1]]!=3) {
+    tmp_replace <- data.table()
+    for (i in 1:3){
+      if (!i %in% tmp$x) {
+        tmp.i <- data.table(x=i,y=min.y,z=1,name=n,testset=t.set)
+        tmp_replace <- rbind(tmp_replace,tmp.i)
+      }
+      if (i %in% tmp$x) {
+        tmp.i <- tmp[x==i & name==n][,.(x,y=min.y,z=fdr*3,name,testset=t.set)]
+        tmp_replace <- rbind(tmp_replace,tmp.i)
+      }
+    }
+    heatmapDT <- rbind(heatmapDT,tmp_replace)
+     min.y <- min.y + 1
+  }
+  if (dim(tmp)[[1]]==3) {
+    tmp <- tmp[,.(x,y=min.y,z=fdr*3,name,testset=t.set)]
+    heatmapDT <- rbind(heatmapDT,tmp)
+    min.y <- min.y + 1
+  }
+}
+
+
+heatmapDT[z > 1, z:=1]
+## discretize the fdr
+heatmapDT[z < 0.01, 'FDR p-value':="< 0.01"]
+heatmapDT[z < 0.05 & z >= 0.01, 'FDR p-value':=">= 0.01 < 0.05"]
+heatmapDT[z < 0.1 & z >= 0.05, 'FDR p-value':=">= 0.05 < 0.10"]
+heatmapDT[z < 0.15 & z >= 0.1, 'FDR p-value':=">= 0.10 < 0.15"]
+heatmapDT[z > 0.15, 'FDR p-value':=">= 0.15"]
+
+## reorder the fdr factora
+heatmapDT$`FDR p-value` <- factor(heatmapDT$`FDR p-value`, levels=c("< 0.01", ">= 0.01 < 0.05", ">= 0.05 < 0.10",">= 0.10 < 0.15",">= 0.15"), labels=c("< 0.01", ">= 0.01 < 0.05", ">= 0.05 < 0.10",">= 0.10 < 0.15",">= 0.15"))
+
+p <- ggplot(heatmapDT, aes(x, new.y,fill=`FDR p-value`)) + geom_tile(color="black",size=0.2)
+pc <- p + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) + scale_fill_manual(values=brewer.pal(n = 5, name = 'YlOrRd')[5:1]) + coord_equal() 
+
+
+# tidy the names
+heatmapDT[name=="green",name:="acute SIV infection response, 1"]
+heatmapDT[name=="magenta",name:="acute SIV infection response, 2"]
+
+
+heatmapDT[name=="EBOV",name:="Ebola Virus"]
+heatmapDT[name=="IAV",name:="Influenza A virus"]
+heatmapDT[name=="HIV",name:="HIV-1/HIV-2/SIV"]
+heatmapDT[name=="HCMV",name:="Human cytomegalovirus"]
+heatmapDT[name=="RNA",name:="RNA viruses"]
+heatmapDT[name=="DENV",name:="Dengue virus"]
+heatmapDT[name=="ADV",name:="Adenovirus"]
+heatmapDT[name=="HSV",name:="Herpes simplex virus"]
+
+
+heatmapDT[name=="Chromosome_and_associated_proteins",name:="Chromosome and associated proteins"]
+## add gropued test info.....
+# SIV responsive" "sivmodules"     "ltvip"          "mergedvip"      "REAC"           "KEGG" 
+heatmapDT[testset=="SIV responsive",testsetAcc:="A"]
+heatmapDT[testset=="sivmodules",testsetAcc:="B"]
+heatmapDT[testset=="mergedvip",testsetAcc:="C"]
+heatmapDT[testset=="KEGG",testsetAcc:="D"]
+
+heatmapDT[,new.y:= abs(y-max(y))]
+heatmapSetMeans <- heatmapDT[,mean(new.y),by=testsetAcc]
+
+# add the names for each of the sub categories
+pcc <- pc + coord_fixed(ratio = 1, xlim = c(-14,4), ylim = c(-2,16), expand = TRUE, clip = "on") + theme(legend.text=element_text(size=5),legend.title=element_text(size=7)) + theme(legend.key.size = unit(0.25, "cm"))
+for (n in heatmapDT[,unique(name)]) {
+ pcc <- pcc +  annotate("text", x = -7, y = heatmapDT[name==n,]$new.y[1], label = n,size=1.75)
+}
+
+# add the names for each of the grouped tests
+for (n in heatmapSetMeans[,unique(testsetAcc)]) {
+ pcc <- pcc +  annotate("text", x = -14, y = heatmapSetMeans[testsetAcc==n,]$V1, label = n,size=5/2)
+}
+# add x-axis text, candidate sets
+pcc <- pcc +  annotate("text", x = 1, y = 15.5, label = "0.5%",size=1.75,angle = 90)
+pcc <- pcc +  annotate("text", x = 2, y = 15.5, label = "0.1%",size=1.75,angle = 90)
+pcc <- pcc +  annotate("text", x = 3, y = 15.5, label = "0.05%",size=1.75,angle = 90)
+pcc <- pcc +  annotate("text", x = 2, y = 16.5, label = "3P-CLR Quantile",size=5/2)
+  pdf(file="3P-CLR_heatmap.enrichment.pdf", pointsize=12, width=10/2.54, height=8/2.54)
+pcc
+dev.off()
+ggsave("fdr_figure.pdf",width = 8.2, height = 10,units= "cm")
+ 
+  annotate("text", x = -3, y = 44, label = "SIV responsive",size=3) +
+  annotate("text", x = -3, y = 42, label = heatmapDT[new.y==42,unique(name)],size=3) +
+  annotate("text", x = -3, y = 41, label = heatmapDT[new.y==41,unique(name)],size=3) +
+  annotate("text", x = -3, y = 40, label = heatmapDT[new.y==40,unique(name)],size=3) +
+  annotate("text", x = -7, y = 41, label = "HQ VIPs",size=6) +
+  annotate("text", x = -3, y = 38, label = heatmapDT[new.y==38,unique(name)],size=3) +
+  annotate("text", x = -3, y = 37, label = heatmapDT[new.y==37,unique(name)],size=3) +
+  annotate("text", x = -3, y = 36, label = heatmapDT[new.y==36,unique(name)],size=3) +
+  annotate("text", x = -3, y = 35, label = heatmapDT[new.y==35,unique(name)],size=3) +
+  annotate("text", x = -3, y = 34, label = heatmapDT[new.y==34,unique(name)],size=3) +
+  annotate("text", x = -3, y = 33, label = heatmapDT[new.y==33,unique(name)],size=3) +
+  annotate("text", x = -3, y = 32, label = heatmapDT[new.y==32,unique(name)],size=3) +
+  annotate("text", x = -3, y = 31, label = heatmapDT[new.y==31,unique(name)],size=3) +
+  annotate("text", x = -3, y = 30, label = heatmapDT[new.y==30,unique(name)],size=3) +
+  annotate("text", x = -3, y = 29, label = heatmapDT[new.y==29,unique(name)],size=3) +
+  annotate("text", x = -7, y = 33.5, label = "all VIPs",size=6) +
+  annotate("text", x = -3, y = 27, label = heatmapDT[new.y==27,unique(name)],size=3) +
+  annotate("text", x = -3, y = 26, label = heatmapDT[new.y==26,unique(name)],size=3) +
+  annotate("text", x = -3, y = 25, label = heatmapDT[new.y==25,unique(name)],size=3) +
+  annotate("text", x = -3, y = 24, label = heatmapDT[new.y==24,unique(name)],size=3) +
+  annotate("text", x = -3, y = 23, label = heatmapDT[new.y==23,unique(name)],size=3) +
+  annotate("text", x = -3, y = 22, label = heatmapDT[new.y==22,unique(name)],size=3) +
+  annotate("text", x = -3, y = 21, label = heatmapDT[new.y==21,unique(name)],size=3) +
+  annotate("text", x = -3, y = 20, label = heatmapDT[new.y==20,unique(name)],size=3) +
+  annotate("text", x = -3, y = 19, label = heatmapDT[new.y==19,unique(name)],size=3) +
+  annotate("text", x = -3, y = 18, label = heatmapDT[new.y==18,unique(name)],size=3) +
+  annotate("text", x = -3, y = 17, label = heatmapDT[new.y==17,unique(name)],size=3) +
+  annotate("text", x = -3, y = 16, label = heatmapDT[new.y==16,unique(name)],size=3) +
+  annotate("text", x = -3, y = 15, label = heatmapDT[new.y==15,unique(name)],size=3) +
+  annotate("text", x = -3, y = 14, label = heatmapDT[new.y==14,unique(name)],size=3) +
+  annotate("text", x = -3, y = 13, label = heatmapDT[new.y==13,unique(name)],size=3) +
+  annotate("text", x = -3, y = 12, label = heatmapDT[new.y==12,unique(name)],size=3) +
+  annotate("text", x = -3, y = 11, label = heatmapDT[new.y==11,unique(name)],size=3) +
+  annotate("text", x = -3, y = 10, label = heatmapDT[new.y==10,unique(name)],size=3) +
+  annotate("text", x = -3, y = 9, label = heatmapDT[new.y==9,unique(name)],size=3) +
+  annotate("text", x = -3, y = 8, label = heatmapDT[new.y==8,unique(name)],size=3) +
+  annotate("text", x = -3, y = 7, label = heatmapDT[new.y==7,unique(name)],size=3) +
+  annotate("text", x = -3, y = 6, label = heatmapDT[new.y==6,unique(name)],size=3) +
+  annotate("text", x = -3, y = 5, label = heatmapDT[new.y==5,unique(name)],size=3) +
+  annotate("text", x = -3, y = 4, label = heatmapDT[new.y==4,unique(name)],size=3) +
+  annotate("text", x = -7, y = 15.5, label = "REACTOME",size=6) +
+
+```
+
+

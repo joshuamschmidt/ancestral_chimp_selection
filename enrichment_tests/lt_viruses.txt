@@ -1,0 +1,101 @@
+abbreviation	virus name
+EBV	Epstein-Barr Virus
+VACV	Vaccinia Virus
+HBV	Hepatitis B virus
+HIV1	Human Immunodeficiency Virus type 1
+HIV2	Human Immunodeficiency Virus type 2
+HSV	Herpes Simplex Virus
+ADV	Adenovirus
+HTLV	Human T-lymphotropic virus
+HCV	Hepatitis C Virus
+BCV	Baculovirus
+SV40	Simian Virus 40
+KSHV	Kaposi's Sarcoma-associated Virus
+SARSCOV	SARS Coronavirus
+CHIKV	Chinkungunya Virus
+MLV	Murine Leukemia Virus
+INFLUENZA	Influenza virus
+MMTV	Mouse Mammary Tumor Virus
+SIV	Simian Immunodeficiency Virus
+POLYOMAVIRUS	Polyomavirus
+FMDV	Foot-and-Mouth Disease Virus
+MVM	Minute Virus of Mice
+POXV	Poxvirus
+PRRSV	Porcine Reproducitve and Respirtory Syndrome Virus
+HHV6	Human herpes Virus 6
+MYXV	Myxoma Virus
+POLIOVIRUS	Poliovirus
+LGTV	Langat Virus
+CSFV	Classical Swine Fever Virus
+BFV	Bovine Foamy Virus
+PARVOVIRUS	Parvovirus
+FLV	Feline Leukemia Virus
+BHV	Bovine Herpes Virus
+ARENAVIRUS	Arenvirus
+NDV	Newcastle Disease Virus
+YFV	Yellow Fever Virus
+CORONAVIRUS	Coronavirus
+MARV	Marburgvirus
+EIAV	Equine Infectious Anemia Virus
+EV71	Enterovirus 71
+MHV	Murine Gammaherpesvirus
+ASFV	African Swine Fever Virus
+LASF	Lassa Fever Virus
+EBOV 	Ebola Virus
+BLV	Bovine Leukemia Virus
+VZV	Varicella Zoster Virus
+RVFV	Rift Valley Fever Virus
+NORWALKVIRUS	Norwalk Virus
+VSV	Vesicular Stomatitis Virus
+HDV	Hepatitis D virus
+BOCAVIRUS	Human Bocavirus
+MHPV	Murine Hepatitis Virus
+HCOVNL63	Human Coronavirus NL63
+JCV	JC Virus
+BPV	Bovine Papillomavirus
+HCMV	Human Cytomegalovirus
+FIBROMAVIRUS	Fibroma Virus
+DENV	Dengue Fever Virus
+HANTAVIRUS	Hantavirus
+ROTAVIRUS	Rotavirus
+RABIESVIRUS	Rabies Virus
+HERPESVIRUSSAIMIRI	Herpesvirus Saimiri
+FCV	Feline Calicivirus
+HEV	Hepatitis E Virus
+RBV	Rubella Virus
+NIPAHVIRUS	Nipah Virus
+MCV	Molluscum Contagiosum Virus
+JEV	Japanese Encephalitis Virus
+ORTHOPOXVIRUS	 Orthopoxvirus
+PARAMYXOVIRUS	 Paramyxovirus
+RPV	Rinderpest Virus
+MEV	Measle Virus
+TMEV	Theiler's Murine Encephalomyelitis Virus
+TBEV	Tick-Borne Encephalitis Virus
+WNV	West Nile Virus
+SINV	Sindbis Virus
+PARVOVIRUSB19	Parvovirus B19
+TGEV	Transmissible Gastroenteritis Coronavirus
+MCMV	Murine Cytomegalovirus
+COXSV	Coxsiackievirus
+FOAMYVIRUS	Foamy virus
+PCV	Porcine Cirocvirus
+GALV	Gibbon Ape Leukemia Virus
+HRV	Human Rhinovirus
+rHPV	Rhesus papillomavirus
+ECHOVIRUS	Echovirus
+CRPV	Cottontail Rabbit Papillomavirus
+LACROSSEVIRUS	La Crosse Virus
+TBLV	Type B Leukemogenic Virus
+BUNV	Bunyamwera Orthobunyavirus
+MUMPSVIRUS	Mumps Virus
+ASTROVIRUS	Astrovirus
+PARAMYXOVIRUS	Paramyxovirus
+MPMV	Mason-Pfizer Monkey Virus
+HCOV229E	Human Coronavirus 229E
+SEOV	Seoul Virus
+BDV	Borna Disease Virus
+BVBD	Bovine Viral Diarrhea Virus
+SEV	Sendai Virus
+BTV	Blue Tongue Virus
+JSRV	Jaagsiekte Sheep Retrovirus

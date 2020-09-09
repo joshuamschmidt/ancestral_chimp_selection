@@ -1,0 +1,13 @@
+siv_modules:31	1.128	6	0.0008120000	0.0094820000	6	106	109	magenta	hook3,cacnb3,znf609,rab35,fmnl3,rabgap1l
+siv_modules:18	0.807	3	0.0462780000	0.2904860000	3	91	93	purple	syncrip,yipf4,srcap
+siv_modules:29	1.427	4	0.0539540000	0.2904860000	4	147	151	yellow	galk2,eif5b,rai1,vps35
+siv_modules:25	0.446	2	0.0732630000	0.3221907500	2	76	79	greenyellow	shcbp1,sbno1
+siv_modules:33	0.620	2	0.1274710000	0.3954740000	2	115	126	green	tulp4,srcap
+siv_modules:26	0.769	2	0.1787200000	0.4577856667	2	87	92	pink	cd28,med9
+siv_modules:16	0.339	1	0.2924590000	0.7606575714	1	26	26	grey60	dand5
+siv_modules:30	1.270	2	0.3646600000	0.9253630000	2	85	85	tan	xpo1,prpsap2
+siv_modules:21	0.478	1	0.3890530000	0.9253630000	1	24	25	orange	serpinc1
+siv_modules:3	1.573	1	0.8097930000	1.0000000000	1	76	79	black	myt1l
+siv_modules:2	4.530	3	0.8404250000	1.0000000000	3	333	347	turquoise	wdr76,sdf2,synpo2l
+siv_modules:32	1.785	1	0.8427050000	1.0000000000	1	136	149	blue	xpo1
+GO:9999999	205.015	205	1.0000000000	1.0000000000	205	15198	16198	all_genes	fam227b,rad23a,mcmbp,dand5,shcbp1,prkag1,khdrbs1,gpn3,rc3h1,fam216a,ndufa11,atf7,akap13,aldh3a1,znf764,tmem39b,nup155,znf771,top3a,trip4,itgal,mtmr11,ccdc28b,fam186b,larp4,ganc,tuba1a,myoz1,bhmg1,llgl1,gadd45gip1,calu,cd28,serinc4,aimp2,brap,flii,c12orf65,wdr76,eral1,wdr70,c5orf42,gfod2,pemt,rad9b,dhx38,dmpk,ppl,nckap5l,sept12,txlna,cux2,veph1,pcbp2,b9d1,prr13,sez6l2,zfhx3,cfap70,mcrs1,tmprss12,rel,myt1l,ppp1cc,hook3,eif2ak1,galk2,xpo1,xpo5,ubap2,sdf2,znf689,cacna2d3,ccdc136,prkdc,tctn1,syncrip,kiaa0100,pcnp,csnk1g1,sf3b4,nfix,pgap3,mss51,pex13,frmd5,fam109a,ubn1,ctla4,snx14,cenpl,tlcd1,uchl5,hypk,ptp4a2,fkbp11,nek8,usp54,bicdl1,cabin1,kif22,dmxl2,fetub,yipf4,usp42,yipf3,tjap1,faim2,otud7b,fgf7,epn2,synj1,kpna6,ap4s1,ccdc63,kif3c,ccdc65,eif5b,slc5a10,kmt2d,ppp1r13l,akap8l,znf48,aadacl4,kiaa1841,rai1,klc3,sbno1,wnt1,atxn2,casc4,znf106,arhgef4,bptf,cacnb3,kcnh3,sp1,asphd1,fam168b,linc00935,fbxl18,dlk2,papolg,acad10,mfap1,mad2l1bp,dip2b,ddx23,kmt5a,vps45,sympk,polh,anapc7,tulp4,srcap,fam222b,prpsap2,mcu,sept1,gphn,znf609,cyth3,mapk7,ankrd13a,ddx60l,vps35,synpo2l,rhebl1,aldh2,fbxw10,vps29,rsph6a,rogdi,asxl2,rab34,rab35,serpinc1,map3k12,ift81,sh2b3,pus10,fbrs,usp34,kctd13,lmbr1l,dars2,rev1,fmnl3,med9,erbb2,sin3a,mapkapk5,mvp,rabgap1l,birc6,sash1,fam83g,ddn,qpctl,pptc7,hpse2,atp2a2,spats2,pdia3,coch
