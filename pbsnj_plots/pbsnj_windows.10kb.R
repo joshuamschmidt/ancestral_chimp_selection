@@ -1,5 +1,5 @@
 library(data.table)
-setwd("/Users/joshuaschmidt/Projects/ancestral_chimpanzee/pbsnj_windows")
+setwd("~/Projects/ancestral_chimpanzee_selection")
 # combine all
 allPBSnj <- data.table()
 for ( c in c(1,"2A","2B",3:22)){
@@ -11,18 +11,18 @@ for ( c in c(1,"2A","2B",3:22)){
 allPBSnj[,Internal.s:=Internal/(1+Internal+Western + Nigeria + Central + Eastern)]
 allPBSnj[,Internal.n:=(Internal.s-min(Internal.s))/(max(Internal.s)-min(Internal.s))]
 # candidates
-cands <- fread("/Users/joshuaschmidt/Downloads/aligned_3pclr_out_genome_wide_0.005percentsubsetCANDSNP.txt",col.names = c("chr","pos"))
+cands <- fread("pbsnj_plots/aligned_3pclr_out_genome_wide_0.005percentsubsetCANDSNP.txt",col.names = c("chr","pos"))
 cands <- allPBSnj[cands,on=.(chr,pos),roll="nearest"]
 
 
-cands2 <- fread("/Users/joshuaschmidt/Downloads/aligned_3pclr_out_genome_wide_0.0005percentsubsetCANDSNP.txt",col.names = c("chr","pos"))
+cands2 <- fread("pbsnj_plots/aligned_3pclr_out_genome_wide_0.0005percentsubsetCANDSNP.txt",col.names = c("chr","pos"))
 cands2 <- allPBSnj[cands2,on=.(chr,pos),roll="nearest"]
 
-cands3 <- fread("/Users/joshuaschmidt/Downloads/aligned_3pclr_out_genome_wide_0.1percentsubsetCANDSNP.txt",col.names = c("chr","pos"))
+cands3 <- fread("pbsnj_plots/aligned_3pclr_out_genome_wide_0.1percentsubsetCANDSNP.txt",col.names = c("chr","pos"))
 cands3 <- allPBSnj[cands3,on=.(chr,pos),roll="nearest"]
 
 # background
-back <- fread("/Users/joshuaschmidt/Downloads/all.windows.3pclr.ce.ncBACKGROUNDSNPint.txt",col.names = c("chr","pos"))
+back <- fread("pbsnj_plots/all.windows.3pclr.ce.ncBACKGROUNDSNPint.txt",col.names = c("chr","pos"))
 back <- allPBSnj[back,on=.(chr,pos),roll="nearest"]
 back[,median(Internal.n,na.rm = T)]
 back[,mean(Internal.n,na.rm = T)]
