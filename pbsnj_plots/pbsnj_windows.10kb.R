@@ -48,25 +48,31 @@ vioplot(back[!Internal.n %in% NA]$Internal.n,
         ylim=c(0,1))
 mtext(side = 1.2,text = "PBSnjINT",line = 1.5,cex = 1.25,at = 0.5)
 dev.off()
-# # also try ggplot style
-# library(ggplot2)
-# longDT <- data.table()
-# 
-# longDT <- rbindlist(list(longDT,data.table(class="background",PBSnjInt=back[!Internal.n %in% NA]$Internal.n)))
-# longDT <- rbindlist(list(longDT,data.table(class="0.5%",PBSnjInt=cands[!Internal.n %in% NA]$Internal.n)))
-# longDT <- rbindlist(list(longDT,data.table(class="0.1%",PBSnjInt=cands2[!Internal.n %in% NA]$Internal.n)))
-# longDT <- rbindlist(list(longDT,data.table(class="0.05%",PBSnjInt=cands3[!Internal.n %in% NA]$Internal.n)))
-# 
-# 
-# median.quartile <- function(x){
-#   out <- quantile(x, probs = c(0.25,0.5,0.75))
-#   names(out) <- c("ymin","y","ymax")
-#   return(out) 
-# }
-# 
-# 
-# p <- ggplot(longDT, aes(PBSnjInt, factor(class)))
-# p + geom_violin() + stat_summary(fun.y=median.quartile,geom='point')
 
 
-t.test(cands[!Internal.n %in% NA]$Internal.n,back[!Internal.n %in% NA]$Internal.n)
+# stat test?
+# need the 3pclr pvalues or LL
+ll <- fread("sed -e '/Chr/d' /Users/joshuaschmidt/Projects/ancestral_chimp/all.windows.3pclr.ce.nc.txt",select = c("V1","V2","V9"),col.names = c("chr","pos","LL"))
+setkey(ll,chr,pos)
+ll <- ll[back,on=.(chr,pos)][!Internal.n %in% NA]
+model <- lm(Internal.n ~ LL , data = ll)
+summary(model)
+
+
+# Call:
+#   lm(formula = Internal.n ~ LL, data = ll)
+# 
+# Residuals:
+#   Min       1Q   Median       3Q      Max 
+# -0.29463 -0.06789 -0.02794  0.04016  0.75704 
+# 
+# Coefficients:
+#   Estimate Std. Error t value Pr(>|t|)    
+# (Intercept) 1.072e-01  1.221e-04   877.9   <2e-16 ***
+#   LL          3.206e-04  2.981e-06   107.5   <2e-16 ***
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.09568 on 824808 degrees of freedom
+# Multiple R-squared:  0.01383,	Adjusted R-squared:  0.01383 
+# F-statistic: 1.157e+04 on 1 and 824808 DF,  p-value: < 2.2e-16
