@@ -234,7 +234,7 @@ plot(x=0:36,
      xlab = "SFS",
      col = "#da735a",
      pch = 19,
-     lwd = 2,
+     lwd = 1,
      xaxt = "n",
      cex.lab = 1.25)
 axis(1, at = seq(0, 40, by = 10), las=1)
@@ -243,13 +243,13 @@ points(x=0:36,
        type='b',
        col = "#dec4a3",
        pch = 19,
-       lwd = 2)
+       lwd = 1)
 points(x=0:36,
        y=cscaled01,
        type='b',
        col = "#dc9e76",
        pch = 19,
-       lwd = 2)
+       lwd = 1)
 abline(h = 1,col="darkgrey",lty=5)
 legend("topleft",
        legend = c("0.5","0.1", "0.05"),
@@ -268,7 +268,7 @@ plot(x=0:38,
      xlab = "SFS",
      col = "#da735a",
      pch = 19,
-     lwd = 2,
+     lwd = 1,
      xaxt = "n",
      cex.lab = 1.25)
 axis(1, at = seq(0, 40, by = 10), las=1)
@@ -277,13 +277,13 @@ points(x=0:38,
        type='b',
        col = "#dec4a3",
        pch = 19,
-       lwd = 2)
+       lwd = 1)
 points(x=0:38,
        y=escaled01,
        type='b',
        col = "#dc9e76",
        pch = 19,
-       lwd = 2)
+       lwd = 1)
 abline(h = 1,col="darkgrey",lty=5)
 legend("topleft",
        legend = c("0.5","0.1", "0.05"),
