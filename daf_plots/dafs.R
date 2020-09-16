@@ -217,10 +217,10 @@ yscale <- range(c(cscaled005,escaled005,cscaled01,escaled01,cscaled05,escaled05)
 # for PNAS that is 17.8/4 ~ 1.75 inches
 setwd("~/Projects/ancestral_chimp_selection/daf_plots")
 pdf(file="relative.dafs.pdf",
-    width = 4,
+    width = 1.75,
     height = 2,
     pointsize = 6,fonts = "Helvetica")
-par(mfrow=c(1,2))
+par(mfrow=c(2,1))
 par(las=2)
 par(mgp=c(1.8,0.5,0))
 par(mar = c(3, 3, 0.1, 0.1))
