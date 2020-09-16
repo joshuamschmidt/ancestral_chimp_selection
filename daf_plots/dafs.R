@@ -203,16 +203,97 @@ ctest_005 <- wilcox.test(x=round(dafs.human[,.(c.maf=ifelse(c.daf < 0.5,c.daf,1-
                          alternative = "two.sided")
 
 # plot the scaled SFSs
-escaled05 <- e2_0.5$density/e1_0.5$density
-escaled01 <- e2_0.1$density/e1_0.1$density
-escaled005 <- e2_0.05$density/e1_0.05$density
-cscaled05 <- c2_0.5$density/c1_0.5$density
-cscaled01 <- c2_0.1$density/c1_0.1$density
-cscaled005 <- c2_0.05$density/c1_0.05$density
+escaled05 <- e2_0.5$frequency/e1_0.5$frequency
+escaled01 <- e2_0.1$frequency/e1_0.1$frequency
+escaled005 <- e2_0.05$frequency/e1_0.05$frequency
+cscaled05 <- c2_0.5$frequency/c1_0.5$frequency
+cscaled01 <- c2_0.1$frequency/c1_0.1$frequency
+cscaled005 <- c2_0.05$frequency/c1_0.05$frequency
 
 yscale <- range(c(cscaled005,escaled005,cscaled01,escaled01,cscaled05,escaled05))
-par(mfrow=c(2,1))
-plot(x=0:38,y=escaled005,type='b',ylim=c(yscale[1],yscale[2]))
+
+# image is part of a four panel plot? to being with
+# lets use max width /4
+# for PNAS that is 17.8/4 ~ 1.75 inches
+setwd("~/Projects/ancestral_chimp_selection/daf_plots")
+pdf(file="relative.dafs.pdf",
+    width = 4,
+    height = 2,
+    pointsize = 6,fonts = "Helvetica")
+par(mfrow=c(1,2))
+par(las=2)
+par(mgp=c(1.8,0.5,0))
+par(mar = c(3, 3, 0.1, 0.1))
+# central
+
+plot(x=0:36,
+     y=cscaled005,
+     type='b',
+     ylim=c(yscale[1],yscale[2]),
+     ylab = "C / BG (Pr.)",
+     xlab = "SFS",
+     col = "#da735a",
+     pch = 19,
+     lwd = 2,
+     xaxt = "n",
+     cex.lab = 1.25)
+axis(1, at = seq(0, 40, by = 10), las=1)
+points(x=0:36,
+       y=cscaled05,
+       type='b',
+       col = "#dec4a3",
+       pch = 19,
+       lwd = 2)
+points(x=0:36,
+       y=cscaled01,
+       type='b',
+       col = "#dc9e76",
+       pch = 19,
+       lwd = 2)
+abline(h = 1,col="darkgrey",lty=5)
+legend("topleft",
+       legend = c("0.5","0.1", "0.05"),
+       col = c("#dec4a3","#dc9e76", "#da735a"),
+       pch = c(19, 19, 19),
+       bty = "n",
+       horiz = TRUE)
+
+
+#eastern
+plot(x=0:38,
+     y=escaled005,
+     type='b',
+     ylim=c(yscale[1],yscale[2]),
+     ylab = "C / BG (Pr.)",
+     xlab = "SFS",
+     col = "#da735a",
+     pch = 19,
+     lwd = 2,
+     xaxt = "n",
+     cex.lab = 1.25)
+axis(1, at = seq(0, 40, by = 10), las=1)
+points(x=0:38,
+       y=escaled05,
+       type='b',
+       col = "#dec4a3",
+       pch = 19,
+       lwd = 2)
+points(x=0:38,
+       y=escaled01,
+       type='b',
+       col = "#dc9e76",
+       pch = 19,
+       lwd = 2)
+abline(h = 1,col="darkgrey",lty=5)
+legend("topleft",
+       legend = c("0.5","0.1", "0.05"),
+       col = c("#dec4a3","#dc9e76", "#da735a"),
+       pch = c(19, 19, 19),
+       bty = "n",
+       horiz = TRUE)
+dev.off()
+
+
 
 
 # # nigeria chimp
