@@ -44,6 +44,20 @@ if (file.exists("all_ens.SO.definitions.gtf")){
   file.remove("all_ens.SO.definitions.gtf")
 }
 
+fwrite(x = panTro_elements[,.(chr=chr.s,
+                              source='josh',
+                              type='exon',
+                              start,
+                              end,
+                              filter=".",
+                              strand="+",
+                              phase="0",
+                              desc=paste('gene_id \"',id,'\";',sep=""))],
+       file = "all_ens.SO.definitions.gtf",
+       quote = F,
+       col.names = F,
+       row.names = F,
+       sep = "\t")
 
 
 
